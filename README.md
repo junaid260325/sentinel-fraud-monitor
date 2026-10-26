@@ -1,12 +1,10 @@
 # Sentinel Fraud Monitor
 
-A responsive, browser-based credit card fraud monitoring demo with a sign-in page. No installation or build step is required.
+A responsive, browser-based credit card fraud monitoring demo. The public website opens directly to its Overview page; no login is required.
 
 ## Run it
 
 For the best experience, run `py -m http.server 8000` from this folder and visit `http://localhost:8000`. You can also open `index.html` directly in a modern browser.
-
-Demo sign-in: `jordan.davis@sentinel.demo` / `SentinelDemo26!`
 
 ## What works
 
@@ -15,9 +13,8 @@ Demo sign-in: `jordan.davis@sentinel.demo` / `SentinelDemo26!`
 - Import CSV transactions and download either all transactions or the currently filtered list.
 - Simulate incoming transactions and see the dashboard update.
 - Save transaction decisions and imported/demo activity in browser local storage.
-- Explore dedicated Overview, Transactions, and Risk model pages using the workspace navigation.
+- Explore dedicated Overview (`dashboard.html`), Transactions (`transactions.html`), and Risk Model (`risk-model.html`) pages using the workspace navigation.
 - View transaction activity and risk distribution based on the current local dataset.
-- Sign in and out of the local demo workspace.
 
 The pages are `dashboard.html` (Overview), `transactions.html` (Transactions), and `risk-model.html` (Risk model).
 
@@ -25,4 +22,4 @@ CSV imports require `merchant` and `amount` columns. Optional columns: `id`, `ca
 
 ## Important limitations
 
-This is a client-side demonstration, not a payment processor or production fraud detection system. Sign-in is a demo-only client-side gate, not secure authentication. Risk scores use simple, visible heuristics and are not produced by a trained model. The sample records are fictional. Data stays in the browser's local storage; there is no server, bank connection, real authentication, or real-time payment feed. Do not enter real credentials or cardholder data.
+This is a client-side demonstration, not a payment processor or production fraud detection system. Risk scores use simple, visible heuristics and are not produced by a trained model. The sample records are fictional. Data stays in the browser's local storage; there is no server, bank connection, authentication, or real-time payment feed. Do not enter real cardholder data.

@@ -1,6 +1,6 @@
 "use strict";
 
-const STORAGE_KEY = "sentinel-demo-transactions-v1";
+const STORAGE_KEY = "sentinel-demo-transactions-v2";
 const DAY = 24 * 60 * 60 * 1000;
 const now = new Date();
 
@@ -23,6 +23,66 @@ const seedTransactions = [
   { id: "TXN-849190", merchant: "Gadget World", category: "Retail", holder: "James Anderson", card: "•••• 5628", amount: 1599.99, currency: "USD", location: "Hong Kong, HK", time: hoursAgo(23), status: "review", signals: ["Unusually high amount", "Card used in a new country"] }
 ];
 
+const supplementalCases = [
+  ["Maple & Main", "Retail", "Toronto, CA", 684.25],
+  ["Bluebird Pharmacy", "Healthcare", "Denver, US", 38.49],
+  ["Orbit Mobile", "Digital goods", "Unknown", 129.99],
+  ["Harbor House Hotel", "Travel", "Miami, US", 742.60],
+  ["Maison Lumiere", "Retail", "Paris, FR", 2160],
+  ["Greenline Grocers", "Food & drink", "Portland, US", 96.18],
+  ["CloudNine Hosting", "Digital goods", "Amsterdam, NL", 399.00],
+  ["CityLink Rail", "Travel", "Boston, US", 64.80],
+  ["Aster Fine Jewelry", "Retail", "Dubai, AE", 4280],
+  ["Northside Medical", "Healthcare", "Minneapolis, US", 184.37],
+  ["PixelArcade", "Digital goods", "Singapore, SG", 849.90],
+  ["Oak & Ember", "Food & drink", "Nashville, US", 128.60],
+  ["Summit Outdoor Co.", "Retail", "Vancouver, CA", 532.49],
+  ["Skyward Airlines", "Travel", "Newark, US", 1164.22],
+  ["QuickCart Online", "Retail", "Unknown", 17.99],
+  ["WellSpring Dental", "Healthcare", "Phoenix, US", 220.00],
+  ["Nova Cloud Services", "Digital goods", "Frankfurt, DE", 2399],
+  ["Parkview Market", "Food & drink", "Charlotte, US", 52.76],
+  ["Sakura Technology", "Retail", "Tokyo, JP", 970.40],
+  ["Coastal Rides", "Travel", "San Diego, US", 32.15],
+  ["Silverline Watches", "Retail", "Geneva, CH", 3180],
+  ["Daily Dose Cafe", "Food & drink", "Philadelphia, US", 16.20],
+  ["SecureStream Media", "Digital goods", "London, UK", 89.99],
+  ["Pioneer Fuel", "Travel", "Dallas, US", 78.30]
+];
+
+const cardholders = [
+  "Harper Lewis", "Benjamin Scott", "Evelyn Turner", "Henry Adams",
+  "Abigail Young", "Daniel King", "Ella Wright", "Samuel Green",
+  "Grace Baker", "Matthew Hill", "Chloe Nelson", "David Carter",
+  "Lily Mitchell", "Joseph Perez", "Zoe Roberts", "Andrew Collins",
+  "Nora Stewart", "Gabriel Morris", "Stella Rogers", "Isaac Cook",
+  "Violet Bailey", "Owen Murphy", "Aria Reed", "Julian Kelly"
+];
+const caseStatuses = [
+  "review", "approved", "blocked", "approved", "review", "approved",
+  "blocked", "approved", "review", "approved", "blocked", "approved"
+];
+const supplementalTransactions = supplementalCases.map(([merchant, category, location, amount], index) => {
+  const signals = [];
+  if (amount >= 500) signals.push("Unusually high amount");
+  if (!/,\s*(US|USA)$/i.test(location)) signals.push(location === "Unknown" ? "Location could not be verified" : "Card used in a new country");
+  if (category === "Digital goods") signals.push("Unfamiliar merchant category");
+  if (!signals.length) signals.push("Typical spending amount");
+  return {
+    id: `TXN-${String(849189 - index).padStart(6, "0")}`,
+    merchant,
+    category,
+    holder: cardholders[index],
+    card: `•••• ${String(3741 + index * 173 % 6000).padStart(4, "0")}`,
+    amount,
+    currency: "USD",
+    location,
+    time: hoursAgo(27 + index * 5),
+    status: caseStatuses[index % caseStatuses.length],
+    signals
+  };
+});
+
 const $ = (selector) => document.querySelector(selector);
 const rowsElement = $("#transaction-rows");
 let transactions = loadTransactions();
@@ -32,7 +92,7 @@ let toastTimer;
 function loadTransactions() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return seedTransactions.map((item) => ({ ...item }));
+    if (!stored) return [...seedTransactions, ...supplementalTransactions].map((item) => ({ ...item }));
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed) || parsed.some((item) => !isValidTransaction(item))) {
       throw new Error("Saved transaction data has an invalid format.");
@@ -42,15 +102,15 @@ function loadTransactions() {
     if (error instanceof SyntaxError || error instanceof TypeError) {
       console.error("Could not read saved demo data:", error);
       showToast("Saved data could not be read. Starting with sample transactions.");
-      return seedTransactions.map((item) => ({ ...item }));
+      return [...seedTransactions, ...supplementalTransactions].map((item) => ({ ...item }));
     }
     if (error instanceof Error && error.message.includes("invalid format")) {
       console.error(error);
       showToast("Saved data was invalid. Starting with sample transactions.");
-      return seedTransactions.map((item) => ({ ...item }));
+      return [...seedTransactions, ...supplementalTransactions].map((item) => ({ ...item }));
     }
     console.error("Could not access local browser storage:", error);
-    return seedTransactions.map((item) => ({ ...item }));
+    return [...seedTransactions, ...supplementalTransactions].map((item) => ({ ...item }));
   }
 }
 
@@ -175,6 +235,7 @@ function renderMetrics() {
   setText("#metric-prevented", formatMoney(transactions.filter((item) => item.status === "blocked").reduce((sum, item) => sum + Number(item.amount), 0)));
   setText("#metric-review", open.toLocaleString("en-US"));
   setText("#metric-rate", total ? `${((flagged / total) * 100).toFixed(2)}%` : "0.00%");
+  setText("#overview-review-count", String(open));
   setText("#risk-total", String(total));
   setText("#risk-low", String(lowRisk));
   setText("#risk-medium", String(mediumRisk));
@@ -507,19 +568,6 @@ on("#clear-filters-button", "click", () => {
 });
 on("#help-button", "click", () => showToast("Sentinel is a local demo. No real card data or bank systems are connected."));
 on("#risk-info", "click", () => showToast("Demo scores: amount, merchant category, location, and listed signals."));
-on(".profile-menu", "click", () => {
-  try {
-    sessionStorage.removeItem("sentinel-demo-auth");
-  } catch (error) {
-    console.warn("Could not clear session-only demo sign-in:", error);
-  }
-  try {
-    localStorage.removeItem("sentinel-demo-auth");
-  } catch (error) {
-    console.warn("Could not clear remembered demo sign-in:", error);
-  }
-  location.replace("index.html");
-});
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && $("#detail-drawer") && !$("#detail-drawer").hidden) closeDetails();
 });
