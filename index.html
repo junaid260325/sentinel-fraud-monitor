@@ -4,11 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#101b33">
-    <meta name="description" content="Sentinel fraud operations overview.">
-    <meta http-equiv="refresh" content="0; url=dashboard.html">
-    <title>Sentinel — Fraud Operations</title>
+    <meta name="description" content="Sign in to the Sentinel fraud monitoring demo workspace.">
+    <title>Sign in — Sentinel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20261026d">
+    <script src="login.js?v=20261026d" defer></script>
   </head>
-  <body>
-    <p>Opening the Sentinel workspace… <a href="dashboard.html">Continue to Overview</a></p>
+  <body class="login-page">
+    <main class="login-layout">
+      <section class="login-brand-panel" aria-label="Sentinel platform">
+        <a class="brand login-brand" href="index.html" aria-label="Sentinel home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M16 3.5 27 8v7.2c0 7.2-4.7 11.8-11 13.3C9.7 27 5 22.4 5 15.2V8l11-4.5Z" stroke="currentColor" stroke-width="2.2"/><path d="m11.5 15.8 3 3 6.2-6.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="brand-name">sentinel<span>.</span></span>
+        </a>
+        <div class="login-brand-copy">
+          <p class="eyebrow">FRAUD OPERATIONS WORKSPACE</p>
+          <h1>Clarity and control for every transaction.</h1>
+          <p>Review sample payment activity, inspect risk signals, and explore a transparent fraud-monitoring workflow.</p>
+        </div>
+        <div class="login-brand-footer"><span class="environment-dot"></span> Demonstration environment <span class="login-footer-divider">·</span> Fictional sample data</div>
+      </section>
+
+      <section class="login-form-panel" aria-labelledby="login-title">
+        <div class="login-form-wrap">
+          <span class="login-mobile-mark brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M16 3.5 27 8v7.2c0 7.2-4.7 11.8-11 13.3C9.7 27 5 22.4 5 15.2V8l11-4.5Z" stroke="currentColor" stroke-width="2.2"/><path d="m11.5 15.8 3 3 6.2-6.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <p class="eyebrow">WELCOME TO SENTINEL</p>
+          <h2 id="login-title">Sign in to your workspace</h2>
+          <p class="login-subtitle">Enter any email and password to continue to the interactive demo.</p>
+          <form id="login-form" class="login-form">
+            <label for="email">Work email</label>
+            <input id="email" name="email" type="email" autocomplete="username" placeholder="you@company.com" required>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter any password" required>
+            <button class="button button-primary login-submit" type="submit">Continue to workspace <span aria-hidden="true">→</span></button>
+          </form>
+          <p class="login-notice"><strong>Demo sign-in only.</strong> This static website does not verify your identity or protect data. Do not enter a real password or payment information.</p>
+        </div>
+        <footer class="login-legal">Sentinel Fraud Monitor <span>·</span> Educational demonstration</footer>
+      </section>
+    </main>
   </body>
 </html>
