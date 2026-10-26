@@ -15,8 +15,11 @@ Demo sign-in: `jordan.davis@sentinel.demo` / `SentinelDemo26!`
 - Import CSV transactions and download either all transactions or the currently filtered list.
 - Simulate incoming transactions and see the dashboard update.
 - Save transaction decisions and imported/demo activity in browser local storage.
+- Explore dedicated Overview, Transactions, and Risk model pages using the workspace navigation.
 - View transaction activity and risk distribution based on the current local dataset.
 - Sign in and out of the local demo workspace.
+
+The pages are `dashboard.html` (Overview), `transactions.html` (Transactions), and `risk-model.html` (Risk model).
 
 CSV imports require `merchant` and `amount` columns. Optional columns: `id`, `category`, `cardholder` (or `holder`), `card`, `currency`, `location`, `time`, and `status`.
 

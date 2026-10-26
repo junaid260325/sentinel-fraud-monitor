@@ -119,9 +119,13 @@ function merchantClass(category) {
 }
 
 function renderTransactions() {
-  const query = $("#search-input").value.trim().toLowerCase();
-  const riskFilter = $("#risk-filter").value;
-  const statusFilter = $("#status-filter").value;
+  const query = ($("#search-input")?.value || "").trim().toLowerCase();
+  const riskFilter = $("#risk-filter")?.value || "all";
+  const statusFilter = $("#status-filter")?.value || "all";
+  const reviewCount = transactions.filter((item) => item.status === "review").length;
+  const navCount = $("#nav-review-count");
+  if (navCount) navCount.textContent = String(reviewCount);
+  if (!rowsElement) return;
   const filtered = transactions.filter((transaction) => {
     const searchable = [transaction.id, transaction.merchant, transaction.holder, transaction.card, transaction.location].join(" ").toLowerCase();
     return (!query || searchable.includes(query)) &&
@@ -142,11 +146,14 @@ function renderTransactions() {
       <td><div class="row-actions"><button class="row-action" data-view="${safeId}" aria-label="View ${safeId}">View</button></div></td>
     </tr>`;
   }).join("");
-  $("#table-count").textContent = String(filtered.length);
-  $("#table-footer-copy").textContent = `Showing ${filtered.length} of ${transactions.length} transactions`;
-  $("#empty-state").hidden = filtered.length !== 0;
-  rowsElement.closest("table").hidden = filtered.length === 0;
-  $("#nav-review-count").textContent = String(transactions.filter((item) => item.status === "review").length);
+  const tableCount = $("#table-count");
+  const footerCopy = $("#table-footer-copy");
+  const emptyState = $("#empty-state");
+  if (tableCount) tableCount.textContent = String(filtered.length);
+  if (footerCopy) footerCopy.textContent = `Showing ${filtered.length} of ${transactions.length} transactions`;
+  if (emptyState) emptyState.hidden = filtered.length !== 0;
+  const table = rowsElement.closest("table");
+  if (table) table.hidden = filtered.length === 0;
 }
 
 function statusLabel(status) {
@@ -160,25 +167,34 @@ function renderMetrics() {
   const highRisk = transactions.filter((item) => riskLevel(item) === "high").length;
   const mediumRisk = transactions.filter((item) => riskLevel(item) === "medium").length;
   const lowRisk = total - highRisk - mediumRisk;
-  $("#metric-screened").textContent = total.toLocaleString("en-US");
-  $("#metric-prevented").textContent = formatMoney(transactions.filter((item) => item.status === "blocked").reduce((sum, item) => sum + Number(item.amount), 0));
-  $("#metric-review").textContent = open.toLocaleString("en-US");
-  $("#metric-rate").textContent = total ? `${((flagged / total) * 100).toFixed(2)}%` : "0.00%";
-  $("#risk-total").textContent = String(total);
-  $("#risk-low").textContent = String(lowRisk);
-  $("#risk-medium").textContent = String(mediumRisk);
-  $("#risk-high").textContent = String(highRisk);
+  const setText = (selector, value) => {
+    const element = $(selector);
+    if (element) element.textContent = value;
+  };
+  setText("#metric-screened", total.toLocaleString("en-US"));
+  setText("#metric-prevented", formatMoney(transactions.filter((item) => item.status === "blocked").reduce((sum, item) => sum + Number(item.amount), 0)));
+  setText("#metric-review", open.toLocaleString("en-US"));
+  setText("#metric-rate", total ? `${((flagged / total) * 100).toFixed(2)}%` : "0.00%");
+  setText("#risk-total", String(total));
+  setText("#risk-low", String(lowRisk));
+  setText("#risk-medium", String(mediumRisk));
+  setText("#risk-high", String(highRisk));
   const lowAngle = total ? lowRisk / total * 360 : 0;
   const mediumAngle = total ? mediumRisk / total * 360 : 0;
-  $("#risk-donut").style.background = total
-    ? `conic-gradient(#635be7 0deg ${highRisk / total * 360}deg, #e7a543 ${highRisk / total * 360}deg ${(highRisk + mediumRisk) / total * 360}deg, #36b18b ${(highRisk + mediumRisk) / total * 360}deg 360deg)`
-    : "conic-gradient(#e9ecf2 0deg 360deg)";
-  $("#chart-total").textContent = total.toLocaleString("en-US");
-  drawChart($("#chart-range").value === "14" ? 14 : 7, lowAngle, mediumAngle);
+  const riskDonut = $("#risk-donut");
+  if (riskDonut) {
+    riskDonut.style.background = total
+      ? `conic-gradient(#635be7 0deg ${highRisk / total * 360}deg, #e7a543 ${highRisk / total * 360}deg ${(highRisk + mediumRisk) / total * 360}deg, #36b18b ${(highRisk + mediumRisk) / total * 360}deg 360deg)`
+      : "conic-gradient(#e9ecf2 0deg 360deg)";
+  }
+  setText("#chart-total", total.toLocaleString("en-US"));
+  const chartRange = $("#chart-range");
+  if (chartRange) drawChart(chartRange.value === "14" ? 14 : 7, lowAngle, mediumAngle);
 }
 
 function drawChart(days, unusedLow, unusedMedium) {
   const canvas = $("#activity-chart");
+  if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
   if (!rect.width || !rect.height) return;
   const ratio = window.devicePixelRatio || 1;
@@ -254,8 +270,10 @@ function render() {
 function renderGreeting() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  $("#greeting").textContent = `${greeting}, Jordan`;
-  $("#date-label").textContent = new Date().toLocaleDateString("en-US", {
+  const greetingElement = $("#greeting");
+  const dateElement = $("#date-label");
+  if (greetingElement) greetingElement.textContent = `${greeting}, Jordan`;
+  if (dateElement) dateElement.textContent = new Date().toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric"
   }).toUpperCase();
 }
@@ -436,24 +454,29 @@ function simulateTransaction() {
   showToast(`New transaction screened: ${transaction.merchant}.`);
 }
 
-$("#search-input").addEventListener("input", renderTransactions);
-$("#risk-filter").addEventListener("change", renderTransactions);
-$("#status-filter").addEventListener("change", renderTransactions);
-$("#chart-range").addEventListener("change", renderMetrics);
-$("#export-button").addEventListener("click", () => exportCsv());
-$("#export-table-button").addEventListener("click", () => {
-  const query = $("#search-input").value.trim().toLowerCase();
-  const risk = $("#risk-filter").value;
-  const status = $("#status-filter").value;
+function on(selector, eventName, handler) {
+  const element = typeof selector === "string" ? $(selector) : selector;
+  if (element) element.addEventListener(eventName, handler);
+}
+
+on("#search-input", "input", renderTransactions);
+on("#risk-filter", "change", renderTransactions);
+on("#status-filter", "change", renderTransactions);
+on("#chart-range", "change", renderMetrics);
+on("#export-button", "click", () => exportCsv());
+on("#export-table-button", "click", () => {
+  const query = ($("#search-input")?.value || "").trim().toLowerCase();
+  const risk = $("#risk-filter")?.value || "all";
+  const status = $("#status-filter")?.value || "all";
   const visible = transactions.filter((item) => {
     const searchable = [item.id, item.merchant, item.holder, item.card, item.location].join(" ").toLowerCase();
     return (!query || searchable.includes(query)) && (risk === "all" || riskLevel(item) === risk) && (status === "all" || item.status === status);
   });
   exportCsv(visible);
 });
-$("#simulate-button").addEventListener("click", simulateTransaction);
-$("#import-button").addEventListener("click", () => $("#file-input").click());
-$("#file-input").addEventListener("change", async (event) => {
+on("#simulate-button", "click", simulateTransaction);
+on("#import-button", "click", () => $("#file-input")?.click());
+on("#file-input", "change", async (event) => {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
   try {
@@ -465,26 +488,26 @@ $("#file-input").addEventListener("change", async (event) => {
     event.target.value = "";
   }
 });
-rowsElement.addEventListener("click", (event) => {
+on(rowsElement, "click", (event) => {
   const button = event.target.closest("[data-view]");
   if (button) openDetails(button.dataset.view);
 });
-$("#drawer-actions").addEventListener("click", (event) => {
+on("#drawer-actions", "click", (event) => {
   const decision = event.target.closest("[data-decision]");
   if (decision && selectedTransactionId) decideTransaction(selectedTransactionId, decision.dataset.decision);
   else if (event.target.closest("[data-close]")) closeDetails();
 });
-$("#close-drawer").addEventListener("click", closeDetails);
-$("#drawer-backdrop").addEventListener("click", closeDetails);
-$("#clear-filters-button").addEventListener("click", () => {
-  $("#search-input").value = "";
-  $("#risk-filter").value = "all";
-  $("#status-filter").value = "all";
+on("#close-drawer", "click", closeDetails);
+on("#drawer-backdrop", "click", closeDetails);
+on("#clear-filters-button", "click", () => {
+  if ($("#search-input")) $("#search-input").value = "";
+  if ($("#risk-filter")) $("#risk-filter").value = "all";
+  if ($("#status-filter")) $("#status-filter").value = "all";
   renderTransactions();
 });
-$("#help-button").addEventListener("click", () => showToast("Sentinel is a local demo. No real card data or bank systems are connected."));
-$("#risk-info").addEventListener("click", () => showToast("Demo scores: amount, merchant category, location, and listed signals."));
-$(".profile-menu").addEventListener("click", () => {
+on("#help-button", "click", () => showToast("Sentinel is a local demo. No real card data or bank systems are connected."));
+on("#risk-info", "click", () => showToast("Demo scores: amount, merchant category, location, and listed signals."));
+on(".profile-menu", "click", () => {
   try {
     sessionStorage.removeItem("sentinel-demo-auth");
   } catch (error) {
@@ -498,9 +521,9 @@ $(".profile-menu").addEventListener("click", () => {
   location.replace("index.html");
 });
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !$("#detail-drawer").hidden) closeDetails();
+  if (event.key === "Escape" && $("#detail-drawer") && !$("#detail-drawer").hidden) closeDetails();
 });
-window.addEventListener("resize", () => drawChart($("#chart-range").value === "14" ? 14 : 7));
+window.addEventListener("resize", () => drawChart($("#chart-range")?.value === "14" ? 14 : 7));
 
 renderGreeting();
 render();

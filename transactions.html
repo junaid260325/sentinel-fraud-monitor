@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101b33">
+    <meta name="description" content="Search, filter, and review transactions in the Sentinel fraud monitoring demo.">
+    <title>Transactions — Sentinel</title>
+    <script>
+      try {
+        if (sessionStorage.getItem("sentinel-demo-auth") !== "true" &&
+            localStorage.getItem("sentinel-demo-auth") !== "true") {
+          location.replace("index.html");
+        }
+      } catch {
+        location.replace("index.html");
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" href="dashboard.html" aria-label="Sentinel overview">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3.5 27 8v7.2c0 7.2-4.7 11.8-11 13.3C9.7 27 5 22.4 5 15.2V8l11-4.5Z" stroke="currentColor" stroke-width="2.2"/><path d="m11.5 15.8 3 3 6.2-6.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="brand-name">sentinel<span>.</span></span>
+        </a>
+        <div class="workspace-label">WORKSPACE</div>
+        <nav class="nav-list">
+          <a class="nav-link" href="dashboard.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>Overview</a>
+          <a class="nav-link active" href="transactions.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16M8 15h3"/></svg>Transactions<span class="nav-count" id="nav-review-count">0</span></a>
+          <a class="nav-link" href="risk-model.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4 7h16M6 7l-3 7h6L6 7ZM18 7l-3 7h6l-3-7ZM8 21h8"/></svg>Risk model</a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="environment-card"><span class="environment-dot"></span><div><strong>Demo environment</strong><small>Local data only</small></div></div>
+          <div class="profile"><div class="avatar">JD</div><div class="profile-copy"><strong>Jordan Davis</strong><small>Fraud analyst</small></div><button class="icon-button profile-menu" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></button></div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumbs"><a href="dashboard.html">Workspace</a><span class="breadcrumb-slash">/</span><strong>Transactions</strong></div>
+          <div class="topbar-actions"><span class="live-indicator"><span></span> Demo monitoring</span><button class="icon-button" id="help-button" aria-label="About this demo" title="About this demo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.4 1.6c-1.1 1.2-2 1.5-2 3M12 17.5h.01"/></svg></button></div>
+        </header>
+        <section class="page-heading">
+          <div><p class="eyebrow">FRAUD OPERATIONS</p><h1>Transactions</h1><p class="page-subtitle">Search activity, investigate risk signals, and resolve review cases.</p></div>
+          <div class="heading-actions">
+            <button class="button button-secondary" id="import-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>Import CSV</button>
+            <input id="file-input" type="file" accept=".csv,text/csv" hidden>
+            <button class="button button-primary" id="simulate-button"><span class="simulate-dot"></span>Simulate transaction</button>
+          </div>
+        </section>
+        <section class="transaction-summary-grid" aria-label="Transaction summary">
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Total transactions</span><span class="metric-icon indigo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 10h16M8 15h3"/></svg></span></div><div class="metric-value" id="metric-screened">—</div><div class="metric-foot"><span>All recorded activity</span></div></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Awaiting review</span><span class="metric-icon amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span></div><div class="metric-value" id="metric-review">—</div><div class="metric-foot"><span class="trend-neutral">Requires analyst action</span></div></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Blocked value</span><span class="metric-icon mint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5.5c0 5.2-3.4 8.5-8 9.5-4.6-1-8-4.3-8-9.5V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/></svg></span></div><div class="metric-value" id="metric-prevented">—</div><div class="metric-foot"><span>Demo amount total</span></div></article>
+        </section>
+        <section class="panel transactions-panel transactions-page-panel">
+          <div class="transactions-heading"><div><div class="title-with-count"><h2>All transactions</h2><span class="table-count" id="table-count">0</span></div><p>Review the transaction queue and take action on individual cases.</p></div><button class="button button-secondary export-small" id="export-table-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Export CSV</button></div>
+          <div class="filter-bar">
+            <label class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input id="search-input" type="search" placeholder="Search merchant, cardholder, ID..." autocomplete="off"></label>
+            <label class="select-wrap filter-select"><span class="sr-only">Filter by risk</span><select id="risk-filter" aria-label="Filter by risk"><option value="all">All risk levels</option><option value="high">High risk</option><option value="medium">Medium risk</option><option value="low">Low risk</option></select></label>
+            <label class="select-wrap filter-select"><span class="sr-only">Filter by status</span><select id="status-filter" aria-label="Filter by status"><option value="all">All statuses</option><option value="review">Needs review</option><option value="approved">Approved</option><option value="blocked">Blocked</option></select></label>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th scope="col">TRANSACTION</th><th scope="col">CARDHOLDER</th><th scope="col">AMOUNT</th><th scope="col">LOCATION</th><th scope="col">RISK SCORE</th><th scope="col">STATUS</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody id="transaction-rows"></tbody></table>
+            <div class="empty-state" id="empty-state" hidden><span class="empty-icon">⌕</span><strong>No transactions found</strong><span>Try adjusting your search or filters.</span><button class="button button-secondary" id="clear-filters-button">Clear filters</button></div>
+          </div>
+          <div class="table-footer"><span id="table-footer-copy">Showing 0 transactions</span><span class="local-data-label"><span></span> Sample data · saved in this browser</span></div>
+        </section>
+        <footer class="page-footer"><span>Sentinel Fraud Monitor <span>·</span> Demo application</span><span>All amounts shown in USD</span></footer>
+      </main>
+    </div>
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="detail-drawer" id="detail-drawer" aria-labelledby="drawer-title" aria-modal="true" role="dialog" hidden>
+      <div class="drawer-header"><div><span class="eyebrow">TRANSACTION DETAILS</span><h2 id="drawer-title">Transaction</h2></div><button class="icon-button" id="close-drawer" aria-label="Close transaction details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+      <div class="drawer-content" id="drawer-content"></div><div class="drawer-actions" id="drawer-actions"></div>
+    </aside>
+    <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>
