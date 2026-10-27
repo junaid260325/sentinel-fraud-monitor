@@ -1,143 +1,60 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#101b33">
-    <meta name="description" content="Sentinel fraud operations overview: transaction activity, screening volume, and review queue metrics.">
-    <title>Overview — Sentinel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20261026d">
-    <script src="auth.js?v=20261026d" defer></script>
-    <script src="app.js?v=20261026c" defer></script>
-  </head>
-  <body>
-    <div class="app-shell">
-      <aside class="sidebar" aria-label="Main navigation">
-        <a class="brand" href="#" aria-label="Sentinel home">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 32 32" fill="none"><path d="M16 3.5 27 8v7.2c0 7.2-4.7 11.8-11 13.3C9.7 27 5 22.4 5 15.2V8l11-4.5Z" stroke="currentColor" stroke-width="2.2"/><path d="m11.5 15.8 3 3 6.2-6.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <span class="brand-name">sentinel<span>.</span></span>
-        </a>
-
-        <div class="workspace-label">WORKSPACE</div>
-        <nav class="nav-list">
-          <a class="nav-link active" href="dashboard.html" aria-current="page">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>
-            Overview
-          </a>
-          <a class="nav-link" href="transactions.html">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16M8 15h3"/></svg>
-            Transactions <span class="nav-count" id="nav-review-count">0</span>
-          </a>
-          <a class="nav-link" href="risk-model.html">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4 7h16M6 7l-3 7h6L6 7ZM18 7l-3 7h6l-3-7ZM8 21h8"/></svg>
-            Risk model
-          </a>
-        </nav>
-
-        <div class="sidebar-bottom">
-          <div class="environment-card">
-            <span class="environment-dot"></span>
-            <div><strong>Demo environment</strong><small>Local data only</small></div>
-          </div>
-          <div class="profile">
-            <div class="avatar">JD</div>
-            <div class="profile-copy"><strong>Fraud operations</strong><small>Review workspace</small></div>
-            <a class="profile-tag sign-out-link" href="index.html?signout=1">SIGN OUT</a>
-          </div>
-        </div>
-      </aside>
-
-      <main id="overview" class="main-content">
-        <header class="topbar">
-          <div class="breadcrumbs"><span>Workspace</span><span class="breadcrumb-slash">/</span><strong>Overview</strong></div>
-          <div class="topbar-actions">
-            <span class="live-indicator"><span></span> Monitoring active</span>
-            <button class="icon-button" id="help-button" aria-label="About this demo" title="About this demo">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.4 1.6c-1.1 1.2-2 1.5-2 3M12 17.5h.01"/></svg>
-            </button>
-          </div>
-        </header>
-
-        <section class="page-heading">
-          <div>
-            <p class="eyebrow" id="date-label"></p>
-            <h1><span id="greeting">Hello, Jordan</span> <span class="wave" aria-hidden="true">✦</span></h1>
-            <p class="page-subtitle">Here’s what’s happening across your transaction network.</p>
-          </div>
-          <div class="heading-actions">
-            <button class="button button-secondary" id="import-button">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
-              Import CSV
-            </button>
-            <input id="file-input" type="file" accept=".csv,text/csv" hidden>
-            <button class="button button-primary" id="export-button">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
-              Export report
-            </button>
-          </div>
-        </section>
-
-        <section class="metrics-grid" aria-label="Key metrics">
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-label">Transactions screened</span><span class="metric-icon indigo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 10h16M8 15h3"/></svg></span></div>
-            <div class="metric-value" id="metric-screened">—</div>
-            <div class="metric-foot"><span>Across the current sample</span></div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-label">Fraud prevented</span><span class="metric-icon mint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5.5c0 5.2-3.4 8.5-8 9.5-4.6-1-8-4.3-8-9.5V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/></svg></span></div>
-            <div class="metric-value" id="metric-prevented">—</div>
-            <div class="metric-foot"><span>Total value of blocked sample cases</span></div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-label">Flagged for review</span><span class="metric-icon amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span></div>
-            <div class="metric-value" id="metric-review">—</div>
-            <div class="metric-foot"><span class="trend-neutral">Open cases in the sample queue</span></div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-label">Fraud rate</span><span class="metric-icon rose"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 17 6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg></span></div>
-            <div class="metric-value" id="metric-rate">—</div>
-            <div class="metric-foot"><span>Blocked cases as a share of sample</span></div>
-          </article>
-        </section>
-
-        <section class="overview-chart-section">
-          <article class="panel chart-panel">
-            <div class="panel-heading">
-              <div><h2>Transaction activity</h2><p>Screened volume and flagged transactions</p></div>
-              <label class="select-wrap"><span class="sr-only">Chart time range</span>
-                <select id="chart-range" aria-label="Chart time range"><option value="7">Last 7 days</option><option value="14">Last 14 days</option></select>
-              </label>
-            </div>
-            <div class="chart-summary"><strong id="chart-total">—</strong><span>transactions this week</span><span class="chart-legend"><i></i> Volume <i class="legend-flagged"></i> Flagged</span></div>
-            <div class="chart-wrap"><canvas id="activity-chart" aria-label="Transaction volume and flagged transaction chart" role="img"></canvas></div>
-          </article>
-
-        </section>
-        <section class="overview-lower-grid">
-          <article class="panel overview-insight-card">
-            <div class="overview-insight-icon amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></div>
-            <div><span class="eyebrow">OPERATIONS</span><h2><span id="overview-review-count">0</span> cases need attention</h2><p>Open the transaction workspace to investigate flagged activity and record decisions.</p><a class="overview-action-link" href="transactions.html">Go to transaction queue <span aria-hidden="true">→</span></a></div>
-          </article>
-          <article class="panel overview-insight-card">
-            <div class="overview-insight-icon indigo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4 7h16M6 7l-3 7h6L6 7ZM18 7l-3 7h6l-3-7ZM8 21h8"/></svg></div>
-            <div><span class="eyebrow">TRANSPARENCY</span><h2>Understand each risk score</h2><p>Review the demo scoring bands, contributing signals, and their limitations.</p><a class="overview-action-link" href="risk-model.html">Explore the risk model <span aria-hidden="true">→</span></a></div>
-          </article>
-        </section>
-        <footer class="page-footer"><span>Sentinel Fraud Monitor <span>·</span> Demo application</span><span>All amounts shown in USD</span></footer>
-      </main>
-    </div>
-
-    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
-    <aside class="detail-drawer" id="detail-drawer" aria-labelledby="drawer-title" aria-modal="true" role="dialog" hidden>
-      <div class="drawer-header"><div><span class="eyebrow">TRANSACTION DETAILS</span><h2 id="drawer-title">Transaction</h2></div><button class="icon-button" id="close-drawer" aria-label="Close transaction details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
-      <div class="drawer-content" id="drawer-content"></div>
-      <div class="drawer-actions" id="drawer-actions"></div>
-    </aside>
-    <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
-  </body>
-</html>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sentinel — Fraud Intelligence</title>
+<link rel="stylesheet" href="enhanced.css">
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+  <a class="brand" href="#"><span class="brand-mark">S</span><span><b>SENTINEL</b><small>FRAUD INTELLIGENCE</small></span></a>
+  <div class="workspace-label">WORKSPACE</div>
+  <button class="nav active" data-view="overview">▦ <span>Overview</span></button>
+  <button class="nav" data-view="transactions">▤ <span>Transactions</span></button>
+  <button class="nav" data-view="risk">◈ <span>Risk model</span></button>
+  <button class="nav" data-view="insights">⌁ <span>Insights</span></button>
+  <div class="sidebar-bottom"><span class="status-dot"></span> Demo environment <small>Local data only</small></div>
+</aside>
+<main class="main">
+<header class="topbar"><div><span class="eyebrow">FRAUD OPERATIONS / DEMO</span><h1 id="page-title">Overview</h1></div><div class="top-actions"><span class="pill"><i></i> Rules engine active</span><button class="btn secondary" id="reset">Reset demo</button><button class="btn secondary" id="logout">Sign out</button></div></header>
+<section id="overview" class="view active">
+  <div class="hero"><div><span class="eyebrow light">TRANSACTION INTELLIGENCE</span><h2>See the signal.<br><em>Stop the suspicious.</em></h2><p>Review transaction activity, surface risk indicators, and prioritize cases for investigation.</p><button class="btn bright" data-goto="transactions">Review transactions ↗</button></div><div class="hero-art"><div class="orbit orbit1"></div><div class="orbit orbit2"></div><div class="shield">✓</div><span class="float-tag tag1">RISK ENGINE <b>ACTIVE</b></span><span class="float-tag tag2">LOCAL DEMO DATA</span></div></div>
+  <div class="metric-grid">
+    <article class="metric"><span>Total transactions</span><strong id="m-total">0</strong><small>Loaded in this browser</small><div class="metric-icon">▤</div></article>
+    <article class="metric"><span>High-risk cases</span><strong id="m-high">0</strong><small class="red">Prioritize review</small><div class="metric-icon red-bg">!</div></article>
+    <article class="metric"><span>Pending review</span><strong id="m-pending">0</strong><small>Not yet resolved</small><div class="metric-icon amber-bg">◷</div></article>
+    <article class="metric"><span>Reviewed cases</span><strong id="m-reviewed">0</strong><small>Marked reviewed or blocked</small><div class="metric-icon green-bg">✓</div></article>
+  </div>
+  <div class="content-grid">
+    <article class="panel"><div class="panel-head"><div><h3>Transaction activity</h3><p>Risk distribution across current demo records</p></div><span class="pill">LIVE LOCAL VIEW</span></div><div id="bars" class="bars"></div><div class="chart-legend"><span><i class="dot low"></i>Low risk</span><span><i class="dot medium"></i>Medium risk</span><span><i class="dot high"></i>High risk</span></div></article>
+    <article class="panel"><div class="panel-head"><div><h3>Risk distribution</h3><p>Current transaction mix</p></div></div><div class="distribution"><div class="donut" id="donut"><div><b id="donut-total">0</b><small>records</small></div></div><div class="dist-list"><div><i class="dot high"></i><span>High</span><b id="dist-high">0</b></div><div><i class="dot medium"></i><span>Medium</span><b id="dist-medium">0</b></div><div><i class="dot low"></i><span>Low</span><b id="dist-low">0</b></div></div></div><button class="text-btn" data-goto="risk">Explore scoring rules →</button></article>
+  </div>
+  <article class="panel"><div class="panel-head"><div><h3>Priority queue</h3><p>Highest-scoring transactions that need attention</p></div><button class="text-btn" data-goto="transactions">View all →</button></div><div class="table-wrap"><table><thead><tr><th>TRANSACTION</th><th>MERCHANT</th><th>AMOUNT</th><th>RISK SCORE</th><th>STATUS</th><th></th></tr></thead><tbody id="priority-rows"></tbody></table></div></article>
+  <p class="disclaimer">DEMO NOTICE · Scores are illustrative rule-based heuristics, not trained ML predictions or probabilities of fraud. Do not use for real payment decisions.</p>
+</section>
+<section id="transactions" class="view">
+  <div class="section-intro"><div><h2>Transaction review</h2><p>Search, filter, inspect, and update local demo records.</p></div><div class="action-row"><label class="btn secondary file-btn">Import CSV<input type="file" id="csv-file" accept=".csv,text/csv"></label><button class="btn secondary" id="export">Export CSV ↓</button><button class="btn primary" id="simulate">＋ Simulate transaction</button></div></div>
+  <div class="filter-bar"><input id="search" placeholder="Search ID, merchant, cardholder…" aria-label="Search transactions"><select id="risk-filter"><option value="all">All risk levels</option><option>High</option><option>Medium</option><option>Low</option></select><select id="status-filter"><option value="all">All statuses</option><option>Pending</option><option>Reviewed</option><option>Blocked</option></select><span id="result-count" class="muted"></span></div>
+  <article class="panel"><div class="table-wrap"><table><thead><tr><th>TRANSACTION</th><th>MERCHANT / CATEGORY</th><th>AMOUNT</th><th>LOCATION</th><th>RISK</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody id="all-rows"></tbody></table></div><div id="empty-state" class="empty hidden">No transactions match these filters. Import a CSV or simulate a transaction.</div></article>
+  <p class="disclaimer">Sample records are fictional. Imported data stays in this browser's local storage.</p>
+</section>
+<section id="risk" class="view">
+  <div class="section-intro"><div><h2>Risk model transparency</h2><p>Inspect the fixed rules used to calculate each illustrative score.</p></div><span class="pill"><i></i> Demo rules active</span></div>
+  <div class="notice"><b>ⓘ Rule-based demo — not a production fraud model</b><p>The score is a heuristic review priority. It is not trained, calibrated, or a probability of fraud.</p></div>
+  <div class="risk-layout"><article class="panel"><h3>Scoring rules</h3><p class="muted">Rules are additive and capped at 99 points.</p><div class="rule"><span class="rule-icon">＄</span><div><b>Transaction amount</b><p>$250–$499: +12 · $500–$999: +24 · $1,000+: +38</p></div></div><div class="rule"><span class="rule-icon">◇</span><div><b>Digital goods</b><p>Merchant category is digital goods: +16</p></div></div><div class="rule"><span class="rule-icon">◎</span><div><b>Location</b><p>Outside US or unknown: +24</p></div></div><div class="rule"><span class="rule-icon">⚑</span><div><b>Multiple review signals</b><p>Each listed signal beyond the first: +5</p></div></div><div class="rule"><span class="rule-icon">8</span><div><b>Starting score</b><p>Every transaction starts at 8 points.</p></div></div></article>
+  <article class="panel"><h3>Try the scoring rules</h3><p class="muted">Adjust the inputs to see how the score changes.</p><label class="field-label">Transaction amount (USD)<input id="try-amount" type="number" min="0" value="650"></label><label class="check"><input id="try-digital" type="checkbox"> Digital goods category (+16)</label><label class="check"><input id="try-location" type="checkbox"> Outside US or unknown (+24)</label><label class="field-label">Number of review signals<select id="try-signals"><option value="1">1 signal</option><option value="2">2 signals</option><option value="3">3 signals</option><option value="4">4 signals</option></select></label><div class="score-result"><div><small>ILLUSTRATIVE SCORE</small><strong id="try-score">32/99</strong></div><span id="try-band" class="risk-badge medium">Medium</span></div></article></div>
+  <div class="band-grid"><div><i class="dot low"></i><b>Low risk</b><strong>0–34</strong><span>Lower relative review priority</span></div><div><i class="dot medium"></i><b>Medium risk</b><strong>35–64</strong><span>Additional attention</span></div><div><i class="dot high"></i><b>High risk</b><strong>65–99</strong><span>Prioritize manual review</span></div></div>
+</section>
+<section id="insights" class="view">
+  <div class="section-intro"><div><h2>Insights & limitations</h2><p>Understand the current demo, its data, and what production readiness would require.</p></div></div>
+  <div class="metric-grid"><article class="metric"><span>Current dataset</span><strong class="text-small">Browser-local</strong><small>Fictional demo/imported CSV</small></article><article class="metric"><span>Model type</span><strong class="text-small">Rule-based</strong><small>No trained ML model connected</small></article><article class="metric"><span>Backend API</span><strong class="text-small">Not connected</strong><small>Static GitHub Pages deployment</small></article><article class="metric"><span>Data persistence</span><strong class="text-small">Local storage</strong><small>Per browser/device</small></article></div>
+  <div class="content-grid"><article class="panel"><h3>Future enhancement roadmap</h3><div class="roadmap"><b>01 · Data pipeline</b><p>Use a documented labeled dataset and validate incoming fields.</p><b>02 · Machine learning</b><p>Train and evaluate a classifier with precision, recall, F1-score, and confusion matrix.</p><b>03 · Secure backend</b><p>Serve predictions through an authenticated API and store cases in a database.</p><b>04 · Monitoring</b><p>Track false positives, missed fraud, model drift, and audit decisions.</p></div></article><article class="panel"><h3>Recommended evaluation</h3><div class="rule"><span class="rule-icon">P</span><div><b>Precision</b><p>Of all flagged transactions, how many were actually fraud?</p></div></div><div class="rule"><span class="rule-icon">R</span><div><b>Recall</b><p>Of all fraud cases, how many did the model detect?</p></div></div><div class="rule"><span class="rule-icon">F</span><div><b>F1-score</b><p>Balances precision and recall.</p></div></div><div class="rule"><span class="rule-icon">≠</span><div><b>Accuracy alone is not enough</b><p>Fraud datasets are often highly imbalanced.</p></div></div></article></div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<dialog id="detail-dialog"><form method="dialog"><button class="close" aria-label="Close">×</button></form><div id="detail-content"></div></dialog>
+<script src="auth.js"></script>
+<script src="enhanced-app.js"></script>
+</body></html>
